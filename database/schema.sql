@@ -32,3 +32,35 @@ CREATE TABLE products (
         CHECK (stock_quantity >= 0),
     CHECK (list_price >= cost)
 );
+
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INTEGER NOT NULL
+        REFERENCES customers(customer_id),
+    order_date DATE NOT NULL,
+    status VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL
+        REFERENCES orders(order_id),
+    product_id INTEGER NOT NULL
+        REFERENCES products(product_id),
+    quantity INTEGER NOT NULL
+        CHECK (quantity > 0),
+    unit_price NUMERIC(10,2) NOT NULL
+        CHECK (unit_price >= 0),
+    discount NUMERIC(5,2) NOT NULL DEFAULT 0
+        CHECK (discount >= 0 AND discount <= 1)
+);
+
+CREATE TABLE payments (
+    payment_id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL
+        REFERENCES orders(order_id),
+    payment_method VARCHAR(50) NOT NULL,
+    payment_amount NUMERIC(10,2) NOT NULL
+        CHECK (payment_amount >= 0),
+    payment_date DATE NOT NULL
+);
